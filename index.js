@@ -48,15 +48,15 @@ io.on("connection", (socket) => {
   });
 
   // Handle user-toggle-audio
-  socket.on("user-toggle-audio", ({ userId, roomId }) => {
-    console.log(`User ${userId} toggled audio in room ${roomId}`);
-    socket.to(roomId).emit("user-toggle-audio", userId);
+  socket.on("user-toggle-audio", ({ userId, roomId, enabled }) => {
+    console.log(`User ${userId} toggled audio in room ${roomId} to ${enabled}`);
+    socket.to(roomId).emit("user-toggle-audio", { userId, enabled });
   });
 
   // Handle user-toggle-video
-  socket.on("user-toggle-video", ({ userId, roomId }) => {
-    console.log(`User ${userId} toggled video in room ${roomId}`);
-    socket.to(roomId).emit("user-toggle-video", userId);
+  socket.on("user-toggle-video", ({ userId, roomId, enabled }) => {
+    console.log(`User ${userId} toggled video in room ${roomId} to ${enabled}`);
+    socket.to(roomId).emit("user-toggle-video", { userId, enabled });
   });
 
   // Handle user-leave
@@ -85,6 +85,19 @@ io.on("connection", (socket) => {
     );
     socket.to(roomId).emit("chat-message", message);
   });
+
+  // Handle user-initial-media-state
+  socket.on(
+    "user-initial-media-state",
+    ({ userId, roomId, videoEnabled, audioEnabled }) => {
+      console.log(
+        `User ${userId} initial media state in room ${roomId}: video=${videoEnabled}, audio=${audioEnabled}`
+      );
+      socket
+        .to(roomId)
+        .emit("user-media-state", { userId, videoEnabled, audioEnabled });
+    }
+  );
 
   // Handle disconnect
   socket.on("disconnect", () => {
