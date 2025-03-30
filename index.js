@@ -53,6 +53,19 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("user-toggle-audio", userId);
   });
 
+  // Handle debug-audio event
+  socket.on("debug-audio", (data) => {
+    console.log(`Audio debug from user ${data.userId} in room ${data.roomId}:`);
+    console.log(data);
+
+    // Broadcast to the room that audio status has been updated
+    socket.to(data.roomId).emit("audio-status-update", {
+      userId: data.userId,
+      hasAudio: data.hasAudio,
+      timestamp: data.timestamp,
+    });
+  });
+
   // Handle user-toggle-video
   socket.on("user-toggle-video", ({ userId, roomId }) => {
     console.log(`User ${userId} toggled video in room ${roomId}`);
