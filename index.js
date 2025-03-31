@@ -86,13 +86,6 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("chat-message", message);
   });
 
-  // Handle video-chunk
-  socket.on("video-chunk", ({ roomId, chunk, userId }) => {
-    console.log(`Nhận video chunk từ ${userId} trong phòng ${roomId}`);
-    // Gửi chunk đến tất cả người dùng khác trong phòng
-    socket.to(roomId).emit("video-chunk", { chunk, userId });
-  });
-
   // Handle disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
