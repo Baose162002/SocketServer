@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/api/turn-credentials", async (req, res) => {
+app.get("/api/get-turn-credentials", async (req, res) => {
   try {
     const credentials = await getTwilioTurnCredentials();
     res.json(credentials);
