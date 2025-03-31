@@ -1,17 +1,42 @@
-const twilio = require("twilio");
-
-// Thay thế bằng thông tin tài khoản Twilio của bạn
-const accountSid = "SK7a2f82a2e35fb2955118699f3a229345"; // SID bạn đã chia sẻ
-const authToken = "667ec1bf6b781ee2079b1806894faf38"; // Bạn cần thêm auth token
-
-// Tạo function để lấy TURN credentials
+// Fallback TURN servers không cần Twilio
 const getTwilioTurnCredentials = () => {
-  const client = twilio(accountSid, authToken);
-
-  return client.tokens.create().then((token) => {
-    return {
-      iceServers: token.iceServers,
-    };
+  return Promise.resolve({
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:19302" },
+      { urls: "stun:global.stun.twilio.com:3478" },
+      {
+        urls: "turn:openrelay.metered.ca:80",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443?transport=tcp",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:relay.metered.ca:80",
+        username: "83eebabf8bf7d2c252ee6c3d",
+        credential: "OZoV0r7Ien5ZdLkA",
+      },
+      {
+        urls: "turn:relay.metered.ca:443",
+        username: "83eebabf8bf7d2c252ee6c3d",
+        credential: "OZoV0r7Ien5ZdLkA",
+      },
+      {
+        urls: "turn:relay.metered.ca:443?transport=tcp",
+        username: "83eebabf8bf7d2c252ee6c3d",
+        credential: "OZoV0r7Ien5ZdLkA",
+      },
+    ],
   });
 };
 
