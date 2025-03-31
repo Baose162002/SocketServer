@@ -2,7 +2,7 @@ const twilio = require("twilio");
 
 // Thay thế bằng thông tin tài khoản Twilio của bạn
 const accountSid = "SK7a2f82a2e35fb2955118699f3a229345"; // SID bạn đã chia sẻ
-const authToken = "667ec1bf6b781ee2079b1806894faf38"; // Bạn cần thêm auth token
+const authToken = ""; // Bạn cần thêm auth token
 
 // Tạo function để lấy TURN credentials
 const getTwilioTurnCredentials = () => {
