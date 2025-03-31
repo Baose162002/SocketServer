@@ -7,9 +7,6 @@ const { getTwilioTurnCredentials } = require("./twilio");
 const app = express();
 app.use(cors());
 
-// Thêm route để lấy TURN credentials
-app.get("/api/turn-credentials", getTwilioTurnCredentials);
-
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -116,6 +113,16 @@ io.on("connection", (socket) => {
       }
     }
   });
+});
+
+app.get("/api/turn-credentials", async (req, res) => {
+  try {
+    const credentials = await getTwilioTurnCredentials();
+    res.json(credentials);
+  } catch (error) {
+    console.error("Error getting TURN credentials:", error);
+    res.status(500).json({ error: "Failed to get TURN credentials" });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
