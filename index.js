@@ -22,15 +22,6 @@ const rooms = new Map();
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // Thêm sự kiện test
-  socket.on("test-connection", (data) => {
-    console.log("Test connection received:", data);
-    socket.emit("test-response", {
-      status: "ok",
-      message: "Connection working",
-    });
-  });
-
   // Handle join-room
   socket.on("join-room", ({ roomId, userId }) => {
     console.log(`User ${userId} joining room ${roomId}`);
@@ -122,14 +113,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
-// Kiểm tra server định kỳ
-setInterval(() => {
-  console.log("Server status:", {
-    connections: io.engine.clientsCount,
-    rooms: Array.from(io.sockets.adapter.rooms.keys()),
-  });
-}, 30000);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
