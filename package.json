@@ -10,6 +10,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "livekit-client": "^2.9.9",
+    "livekit-server-sdk": "^2.10.2",
     "socket.io": "^4.7.2",
     "twilio": "^5.5.1"
   },
