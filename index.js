@@ -2,7 +2,6 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const { getTwilioTurnCredentials } = require("./twilio");
 
 const app = express();
 app.use(cors());
@@ -113,16 +112,6 @@ io.on("connection", (socket) => {
       }
     }
   });
-});
-
-app.get("/api/get-turn-credentials", async (req, res) => {
-  try {
-    const credentials = await getTwilioTurnCredentials();
-    res.json(credentials);
-  } catch (error) {
-    console.error("Error getting TURN credentials:", error);
-    res.status(500).json({ error: "Failed to get TURN credentials" });
-  }
 });
 
 const PORT = process.env.PORT || 5000;
