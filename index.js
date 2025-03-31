@@ -2,9 +2,13 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const { getTwilioTurnCredentials } = require("./twilio");
 
 const app = express();
 app.use(cors());
+
+// Thêm route để lấy TURN credentials
+app.get("/api/turn-credentials", getTwilioTurnCredentials);
 
 const server = http.createServer(app);
 const io = new Server(server, {
