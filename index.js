@@ -33,33 +33,14 @@ io.on("connection", (socket) => {
     if (!rooms.has(roomId)) {
       rooms.set(roomId, new Map());
     }
-    rooms.get(roomId).set(userId, {
-      socketId: socket.id,
-      isMuted: false,
-      isVideoOff: false,
-    });
+    rooms.get(roomId).set(userId, { socketId: socket.id });
 
     // Notify other users in the room
     socket.to(roomId).emit("user-connected", userId);
 
-    // Send list of participants with their states
-    const participants = [];
-    rooms.get(roomId).forEach((userInfo, participantId) => {
-      if (participantId !== userId) {
-        participants.push({
-          id: participantId,
-          isMuted: userInfo.isMuted,
-          isVideoOff: userInfo.isVideoOff,
-        });
-      }
-    });
-
-    // Gửi trạng thái của tất cả user hiện tại cho user mới
-    socket.emit("room-participants-state", { participants });
-
-    // Gửi danh sách tất cả người tham gia
-    const allParticipants = Array.from(rooms.get(roomId).keys());
-    io.to(roomId).emit("room-participants", { participants: allParticipants });
+    // Send list of participants
+    const participants = Array.from(rooms.get(roomId).keys());
+    io.to(roomId).emit("room-participants", { participants });
 
     // Save info for easy cleanup
     socket.roomId = roomId;
@@ -67,32 +48,14 @@ io.on("connection", (socket) => {
   });
 
   // Handle user-toggle-audio
-  socket.on("user-toggle-audio", ({ userId, roomId, isMuted }) => {
-    console.log(
-      `User ${userId} toggled audio in room ${roomId}. Muted: ${isMuted}`
-    );
-
-    // Lưu trạng thái vào rooms
-    if (rooms.has(roomId) && rooms.get(roomId).has(userId)) {
-      rooms.get(roomId).get(userId).isMuted = isMuted;
-    }
-
-    // Gửi thông báo cho các user khác
+  socket.on("user-toggle-audio", ({ userId, roomId }) => {
+    console.log(`User ${userId} toggled audio in room ${roomId}`);
     socket.to(roomId).emit("user-toggle-audio", userId);
   });
 
   // Handle user-toggle-video
-  socket.on("user-toggle-video", ({ userId, roomId, isVideoOff }) => {
-    console.log(
-      `User ${userId} toggled video in room ${roomId}. Video off: ${isVideoOff}`
-    );
-
-    // Lưu trạng thái vào rooms
-    if (rooms.has(roomId) && rooms.get(roomId).has(userId)) {
-      rooms.get(roomId).get(userId).isVideoOff = isVideoOff;
-    }
-
-    // Gửi thông báo cho các user khác
+  socket.on("user-toggle-video", ({ userId, roomId }) => {
+    console.log(`User ${userId} toggled video in room ${roomId}`);
     socket.to(roomId).emit("user-toggle-video", userId);
   });
 
