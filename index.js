@@ -29,11 +29,15 @@ io.on("connection", (socket) => {
     // Join the room
     socket.join(roomId);
 
-    // Save user info
+    // Save user info with default state
     if (!rooms.has(roomId)) {
       rooms.set(roomId, new Map());
     }
-    rooms.get(roomId).set(userId, { socketId: socket.id });
+    rooms.get(roomId).set(userId, {
+      socketId: socket.id,
+      isMuted: false,
+      isVideoOff: false,
+    });
 
     // Notify other users in the room
     socket.to(roomId).emit("user-connected", userId);
@@ -84,6 +88,47 @@ io.on("connection", (socket) => {
       `Message in room ${roomId} from ${message.sender}: ${message.content}`
     );
     socket.to(roomId).emit("chat-message", message);
+  });
+
+  // Handle user-state-update
+  socket.on("user-state-update", ({ userId, roomId, isMuted, isVideoOff }) => {
+    console.log(
+      `User ${userId} updated state: muted=${isMuted}, videoOff=${isVideoOff}`
+    );
+
+    // Lưu trạng thái vào rooms
+    if (rooms.has(roomId) && rooms.get(roomId).has(userId)) {
+      const userInfo = rooms.get(roomId).get(userId);
+      userInfo.isMuted = isMuted;
+      userInfo.isVideoOff = isVideoOff;
+    }
+
+    // Gửi trạng thái mới đến tất cả user trong phòng
+    socket
+      .to(roomId)
+      .emit("user-state-update", { userId, isMuted, isVideoOff });
+  });
+
+  // Handle request-all-states
+  socket.on("request-all-states", ({ roomId }) => {
+    console.log(
+      `User ${socket.userId} requested all states for room ${roomId}`
+    );
+
+    if (rooms.has(roomId)) {
+      const roomUsers = rooms.get(roomId);
+
+      // Gửi trạng thái của tất cả user trong phòng đến user vừa kết nối
+      roomUsers.forEach((userInfo, userId) => {
+        if (userId !== socket.userId) {
+          socket.emit("user-state-update", {
+            userId,
+            isMuted: userInfo.isMuted || false,
+            isVideoOff: userInfo.isVideoOff || false,
+          });
+        }
+      });
+    }
   });
 
   // Handle disconnect
