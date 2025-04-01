@@ -157,6 +157,12 @@ io.on("connection", (socket) => {
       }
     }
   });
+
+  // Thêm xử lý cho sự kiện signal (cho Simple-Peer)
+  socket.on("signal", ({ to, from, signal }) => {
+    console.log(`Forwarding signal from ${from} to ${to}`);
+    io.to(to).emit("signal", { from, signal });
+  });
 });
 
 const PORT = process.env.PORT || 5000;
