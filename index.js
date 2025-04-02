@@ -48,9 +48,19 @@ io.on("connection", (socket) => {
   });
 
   // Handle user-toggle-audio
-  socket.on("user-toggle-audio", ({ userId, roomId }) => {
-    console.log(`User ${userId} toggled audio in room ${roomId}`);
-    socket.to(roomId).emit("user-toggle-audio", userId);
+  socket.on("user-toggle-audio", ({ userId, roomId, isMuted }) => {
+    console.log(
+      `User ${userId} toggled audio in room ${roomId}. Muted: ${isMuted}`
+    );
+
+    // Lưu trạng thái muted vào thông tin người dùng
+    if (rooms.has(roomId) && rooms.get(roomId).has(userId)) {
+      const userInfo = rooms.get(roomId).get(userId);
+      userInfo.isMuted = isMuted;
+    }
+
+    // Chỉ gửi sự kiện đến các người dùng khác trong phòng, không gửi lại cho người gửi
+    socket.to(roomId).emit("user-toggle-audio", { userId, isMuted });
   });
 
   // Handle user-toggle-video
@@ -111,6 +121,22 @@ io.on("connection", (socket) => {
         }
       }
     }
+  });
+
+  // Thêm xử lý cho sync-audio-state
+  socket.on("sync-audio-state", ({ userId, roomId, isMuted }) => {
+    console.log(
+      `User ${userId} syncing audio state in room ${roomId}. Muted: ${isMuted}`
+    );
+
+    // Lưu trạng thái muted vào thông tin người dùng
+    if (rooms.has(roomId) && rooms.get(roomId).has(userId)) {
+      const userInfo = rooms.get(roomId).get(userId);
+      userInfo.isMuted = isMuted;
+    }
+
+    // Chỉ gửi sự kiện đến các người dùng khác trong phòng, không gửi lại cho người gửi
+    socket.to(roomId).emit("sync-audio-state", { userId, isMuted });
   });
 });
 
